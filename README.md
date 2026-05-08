@@ -165,7 +165,7 @@ This avoids AP mismatch when filenames are not numeric COCO IDs.
 
 ## 📈 AP Alignment Curves
 
-COCO-aligned checkpoint selection gives a more stable view of validation progress.
+The curve visualizes the temporal mismatch between internal mAP and COCO AP, motivating COCO AP-based checkpoint selection.
 
 <p align="center">
   <img src="docs/assets/ap_align_metric_curves_en.png" alt="AP alignment metric curves" width="68%">
