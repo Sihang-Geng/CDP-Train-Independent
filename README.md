@@ -5,19 +5,21 @@
 <p>
   <a href="https://github.com/Sihang-Geng/CDP-Train/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white">
-  <img alt="Base" src="https://img.shields.io/badge/base-Ultralytics%20YOLO-111111">
   <img alt="Metric" src="https://img.shields.io/badge/metric-COCO%20AP%20aligned-2E7D32">
-  <img alt="Release" src="https://img.shields.io/badge/release-partial%20research%20code-orange">
+  <img alt="Paper" src="https://img.shields.io/badge/paper-under%20review-orange">
 </p>
 
 </div>
 
-> **Notice**
-> Independent research code built on [Ultralytics](https://github.com/ultralytics/ultralytics). Upstream copyright notices and the GNU AGPL-3.0 license are retained.
+This is the open-source codebase for the **CDP-YOLO / CDP Training Framework** paper, targeting underwater object detection. The work focuses on contour-detail priors, residual-path high-frequency compensation, CDPB/CDPD modules, and COCO AP aligned training/evaluation.
+
+The paper is currently under peer review. The full framework figure and additional details will be released after acceptance.
 
 ## 🎯 COCO-Aligned Evaluation Protocol
 
 > 🎯 **Goal:** reduce unfair comparison caused by fixed-epoch training in detection experiments.
+
+Underwater degradation weakens contour continuity and fine-detail responses before feature extraction begins. CDP is designed to stabilize these structural cues through contour-detail priors and residual-path high-frequency compensation, while the training protocol aligns checkpoint selection with COCO AP to reduce fixed-epoch comparison bias.
 
 | Icon | Common issue | Impact |
 | --- | --- | --- |
