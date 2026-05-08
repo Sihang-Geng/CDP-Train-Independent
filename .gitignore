@@ -132,6 +132,7 @@ venv.bak/
 # VSCode project settings
 .vscode/
 .devcontainer/
+.github/
 
 # Rope project settings
 .ropeproject

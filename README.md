@@ -1,77 +1,87 @@
 <div align="center">
 
-# CDP Training Framework
+# CDP-Train
+
+**COCO-driven training and checkpoint selection for object detection experiments**
 
 <p>
-  <a href="https://github.com/Sihang-Geng/CDP-Train/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white">
-  <img alt="Base" src="https://img.shields.io/badge/base-Ultralytics%20YOLO-111111">
-  <img alt="Metric" src="https://img.shields.io/badge/metric-COCO%20AP%20aligned-2E7D32">
-  <img alt="Release" src="https://img.shields.io/badge/release-partial%20research%20code-orange">
+  <img alt="Task" src="https://img.shields.io/badge/task-object%20detection-2E7D32">
+  <img alt="Metric" src="https://img.shields.io/badge/metric-COCO%20AP-orange">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
 </p>
 
 </div>
 
-> **Notice**
-> Independent research code built on [Ultralytics](https://github.com/ultralytics/ultralytics). Upstream copyright notices and the GNU AGPL-3.0 license are retained.
+CDP-Train is a research codebase for object detection experiments where the training checkpoint is selected by the same COCO AP metric used for paper evaluation. The repository adds training-time COCO API evaluation, COCO-based `best.pt` selection, custom annotation matching, and several experiment utilities on top of a YOLO training pipeline.
 
-## 🎯 COCO-Aligned Evaluation Protocol
+The main motivation is simple: in detection experiments, comparing models only at a fixed final epoch can mix model quality with convergence speed. This code makes the training loop periodically run COCO evaluation and uses `mAP50-95(B)` to decide which checkpoint should be treated as the best model.
 
-> 🎯 **Goal:** reduce unfair comparison caused by fixed-epoch training in detection experiments.
+## What This Repository Contains
 
-| Icon | Common issue | Impact |
-| --- | --- | --- |
-| 📏 | `mAP` != COCO AP | A higher `mAP` may not mean a higher reported AP. |
-| ⏱️ | AP peaks at different epochs | Early models may be evaluated after overfitting. |
-| ⚖️ | Fixed final checkpoint | Results mix model quality with convergence timing. |
-
-**CDP Training Framework** runs COCO evaluation during training and keeps the best-AP checkpoint.
-
-| ✅ Capability | Function |
+| Part | Purpose |
 | --- | --- |
-| COCO AP selection | Uses COCO `mAP50-95(B)` as fitness. |
-| Periodic COCO eval | Runs COCO API every `N` epochs. |
-| Best checkpoint guard | Blocks non-COCO epochs from replacing `best.pt`. |
-| COCO image-id mapping | Aligns prediction `image_id` with annotation JSON. |
+| COCO AP checkpointing | Use COCO `mAP50-95(B)` as the fitness value for `best.pt`. |
+| Scheduled COCO evaluation | Run COCO API every `N` epochs instead of every epoch to control overhead. |
+| Best-checkpoint guard | Prevent non-COCO validation epochs from overwriting a COCO-selected `best.pt`. |
+| COCO annotation lookup | Search common custom COCO JSON locations automatically. |
+| Image-id alignment | Map prediction `image_id` back to annotation JSON IDs for non-numeric filenames. |
+| Optimizer fallback | Fall back to standard `torch.optim.SGD` when custom optimizer paths are unavailable. |
+| Utility scripts | Training, COCO testing, qualitative visualization, and plotting scripts. |
 
-In short, training-time checkpoint selection follows the evaluation metric used in detection papers.
+## Paper Status
 
-## 🛠️ Fair-Comparison Implementation
+The corresponding paper is currently under peer review. The full architecture figure and more detailed methodological description will be released after acceptance. This repository currently focuses on the reproducible training/evaluation code and the core checkpoint-selection protocol.
 
-Detailed changes are in [`FAIR_COMPARISON_IMPLEMENTATION.md`](FAIR_COMPARISON_IMPLEMENTATION.md). In brief, this release adds COCO API evaluation, COCO-based `best.pt` selection, custom COCO JSON lookup, image-id mapping, optimizer fallback, and visualization utilities.
+## Repository Layout
 
-## 🚀 Installation
-
-### 🔁 1. Clone the repository
-
-```bash
-git clone https://github.com/Sihang-Geng/CDP-Train.git
-cd CDP-Train
+```text
+CDP-Train/
+├─ ultralytics/
+│  ├─ engine/
+│  │  ├─ trainer.py          # COCO fitness and best.pt control
+│  │  └─ validator.py        # scheduled COCO evaluation
+│  ├─ models/yolo/detect/
+│  │  └─ val.py              # COCO API evaluation and image-id mapping
+│  ├─ cfg/default.yaml       # CDP-related training arguments
+│  ├─ train.py               # example training entry
+│  ├─ visual.py              # qualitative visualization
+│  ├─ coco-test.py           # COCO evaluation check
+│  └─ plotfig2.py            # plotting utility
+├─ FAIR_COMPARISON_IMPLEMENTATION.md
+├─ pyproject.toml
+└─ LICENSE
 ```
 
-### 🧪 2. Create the environment
+For implementation-level notes, see [`FAIR_COMPARISON_IMPLEMENTATION.md`](FAIR_COMPARISON_IMPLEMENTATION.md).
+
+## Environment
+
+Create a clean environment first:
 
 ```bash
-conda create -n CDP python=3.10 -y
-conda activate CDP
+conda create -n cdp-train python=3.10 -y
+conda activate cdp-train
 ```
 
-### 📦 3. Install dependencies
+Install PyTorch according to your CUDA version. For example:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+Then install this repository in editable mode:
 
 ```bash
 pip install -e .
 pip install pycocotools
 ```
 
-Install the PyTorch version that matches your CUDA environment if it is not already available.
+If you only need CPU debugging, install the CPU version of PyTorch instead. For paper-scale experiments, use a CUDA environment consistent with your local driver and GPU.
 
-## 🗂️ Dataset
+## Data Preparation
 
-This project uses the RUOD dataset: [RUOD on Baidu AI Studio](https://aistudio.baidu.com/datasetdetail/216919).
-
-### 🧰 Data Preparation
-
-Keep your RUOD files in a COCO-style structure and point your YAML to the local paths, for example:
+The experiments use COCO-style detection annotations. A typical dataset layout is:
 
 ```text
 RUOD/
@@ -83,21 +93,35 @@ RUOD/
    └─ instances_val.json
 ```
 
-Use your dataset YAML to map `train` and `val` to local paths.
+Update your dataset YAML so that `train`, `val`, and annotation paths point to your local files. The released code searches several common annotation locations, including:
+
+```text
+{data_path}/annotations/instances_val.json
+{data_path}/annotations/instances_{split}.json
+{data_path}/val/_annotations.coco.json
+{data_path}/instances_val.json
+{data_path}/_annotations.coco.json
+```
+
+The RUOD dataset can be obtained from [Baidu AI Studio](https://aistudio.baidu.com/datasetdetail/216919).
+
+## Run Training
+
+The simplest way is to edit `ultralytics/train.py` for your local model and dataset paths, then run:
 
 ```bash
 python ultralytics/train.py
 ```
 
-Minimal training example:
+Minimal API example:
 
 ```python
 from ultralytics import YOLO
 
-model = YOLO("/root/ultralytics/ultralytics/cfg/models/v8/yolov8s.yaml")
+model = YOLO("ultralytics/cfg/models/v8/yolov8s.yaml")
 
 results = model.train(
-    data="/root/ultralytics/ultralytics/cfg/datasets/RUOD/RUOD_YOLO/data.yaml",
+    data="path/to/data.yaml",
     epochs=250,
     imgsz=640,
     seed=0,
@@ -109,84 +133,53 @@ results = model.train(
     coco_start_epoch=100,
     patience=100,
 )
-
-results = model.val()
 ```
 
-<details>
-<summary><b>🗂️ COCO JSON Compatibility (click to expand)</b></summary>
+Recommended CDP settings:
 
-The validator searches common annotation locations:
+| Argument | Recommended value | Meaning |
+| --- | --- | --- |
+| `save_json` | `True` | Save predictions for COCO API evaluation. |
+| `use_coco_fitness` | `True` | Use COCO AP as the checkpoint-selection metric. |
+| `coco_eval_interval` | `5` or `10` | Run COCO API periodically to reduce overhead. |
+| `coco_only_best` | `True` | Only COCO-evaluated epochs may update `best.pt`. |
+| `coco_start_epoch` | warm-up epoch | Skip early unstable epochs if needed. |
 
-```text
-{data_path}/instances_val2017.json
-{data_path}/annotations/instances_val2017.json
-{data_path}/annotations/instances_val.json
-{data_path}/annotations/instances_{split}.json
-{data_path}/val/_annotations.coco.json
-{data_path}/instances_val.json
-{data_path}/_annotations.coco.json
-```
-
-For custom filenames, an annotation-based image ID map is built:
+For a quick pipeline check, disable COCO fitness:
 
 ```python
-self.img_id_map[Path(img["file_name"]).name] = img["id"]
-self.img_id_map[Path(img["file_name"]).stem] = img["id"]
+save_json=False
+use_coco_fitness=False
 ```
 
-This avoids AP mismatch when filenames are not numeric COCO IDs.
+## Outputs
 
-</details>
+Typical training outputs are saved under `runs/`:
 
-## 🧪 Recommended Modes
+```text
+runs/
+└─ detect/
+   └─ train*/
+      ├─ weights/
+      │  ├─ best.pt
+      │  └─ last.pt
+      ├─ predictions.json
+      └─ results.csv
+```
 
-| Mode | Use case | Key settings |
-| --- | --- | --- |
-| CDP-style fair comparison | Paper experiments and ablation studies. | `save_json=True`, `use_coco_fitness=True`, `coco_eval_interval=5`, `coco_only_best=True` |
-| Fast pipeline check | Debug whether training runs. | `save_json=False`, `use_coco_fitness=False` |
+When CDP settings are enabled, `best.pt` is selected from epochs that actually run COCO API evaluation.
 
-## 🖼️ Qualitative Preview
+## Visualization
 
-The released visualization script supports qualitative inspection of detection outputs.
+Qualitative and plotting utilities are included for checking model behavior and preparing figures:
 
-<p align="center">
-  <img src="ultralytics/example1.png" alt="Qualitative visualization example" width="92%">
-</p>
+```bash
+python ultralytics/visual.py
+python ultralytics/plotfig2.py
+```
 
-<p align="center">
-  <sub><b>Qualitative example.</b> Output generated by the released visualization utility.</sub>
-</p>
+Adjust input image, weight, and output paths inside the scripts according to your local experiment directory.
 
-## 📊 Plotting Preview
+## Acknowledgements and License
 
-The plotting script is released with an example figure output.
-
-<p align="center">
-  <img src="ultralytics/example2.jpg" alt="Figure 8 generated by the released plotting scripts" width="92%">
-</p>
-
-<p align="center">
-  <sub><b>Figure 8.</b> Example output generated by the released plotting utility.</sub>
-</p>
-
-## 🧭 Feature Map
-
-| Module | File | Role |
-| --- | --- | --- |
-| 🧠 Trainer | [`ultralytics/engine/trainer.py`](ultralytics/engine/trainer.py) | COCO fitness and `best.pt` control. |
-| ⏱️ Validator | [`ultralytics/engine/validator.py`](ultralytics/engine/validator.py) | Scheduled JSON and COCO API calls. |
-| 🚀 Training | [`ultralytics/train.py`](ultralytics/train.py) | Example training entry. |
-| 🖼️ Visualization | [`visual.py`](visual.py) | Qualitative detection view. |
-| 📊 Plotting / 3D | [`plotfig2.py`](plotfig2.py), [`3d.py`](3d.py) | Figure plotting and 3D visualization. |
-| 📘 Notes | [`FAIR_COMPARISON_IMPLEMENTATION.md`](FAIR_COMPARISON_IMPLEMENTATION.md) | Full implementation notes. |
-
-## 📦 Released Scope
-
-This repository provides the training, evaluation, and visualization utilities used in the current research codebase.
-
-## 📄 License
-
-This project is released under the GNU AGPL-3.0 license inherited from Ultralytics. See [LICENSE](LICENSE).
-
-Upstream project: [ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
+This repository is a research-oriented derivative implementation based on [Ultralytics YOLO](https://github.com/ultralytics/ultralytics). The upstream copyright notices and GNU AGPL-3.0 license are retained. See [LICENSE](LICENSE).
