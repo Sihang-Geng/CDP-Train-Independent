@@ -11,9 +11,14 @@
 
 </div>
 
-This is the open-source codebase for the **CDP-YOLO / CDP Training Framework** paper, targeting underwater object detection. The work focuses on contour-detail priors, residual-path high-frequency compensation, CDPB/CDPD modules, and COCO AP aligned training/evaluation.
+This repository provides the official open-source implementation of **CDP**, a contour-detail prior guided framework for underwater object detection under noise-coupled degradation.
 
-The paper is currently under peer review. The full framework figure and additional details will be released after acceptance.
+| Focus | Description |
+| --- | --- |
+| **Core idea** | Introduce contour-detail priors to guide robust underwater feature representation. |
+| **Key design** | Strengthen structure-aware feature learning under degraded imaging while keeping the framework lightweight. |
+| **Training protocol** | COCO AP aligned training/evaluation for fair checkpoint selection. |
+| **Paper status** | The paper is currently under peer review; the full framework figure and technical details will be released after acceptance. |
 
 ## 🎯 COCO-Aligned Evaluation Protocol
 
