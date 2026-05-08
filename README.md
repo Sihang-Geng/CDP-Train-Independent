@@ -168,7 +168,7 @@ This avoids AP mismatch when filenames are not numeric COCO IDs.
 COCO-aligned checkpoint selection gives a more stable view of validation progress.
 
 <p align="center">
-  <img src="docs/assets/ap_align_metric_curves_en.png" alt="AP alignment metric curves" width="92%">
+  <img src="docs/assets/ap_align_metric_curves_en.png" alt="AP alignment metric curves" width="68%">
 </p>
 
 ## 🖼️ Qualitative Preview
