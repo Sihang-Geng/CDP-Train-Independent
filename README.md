@@ -1,12 +1,23 @@
 <div align="center">
 
-# CDP Training Framework
+# 🌊 CDP Training Framework
+
+**Contour-Detail Prior Guided Underwater Object Detection**
 
 <p>
-  <a href="https://github.com/Sihang-Geng/CDP-Train/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
   <img alt="Python" src="https://img.shields.io/badge/python-3.8%2B-3776AB?logo=python&logoColor=white">
   <img alt="Metric" src="https://img.shields.io/badge/metric-COCO%20AP%20aligned-2E7D32">
   <img alt="Paper" src="https://img.shields.io/badge/paper-under%20review-orange">
+  <a href="https://github.com/Sihang-Geng/CDP-Train/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
+</p>
+
+<p>
+  <a href="#-coco-aligned-evaluation-protocol">Protocol</a> ·
+  <a href="#-fair-comparison-implementation">Implementation</a> ·
+  <a href="#-installation">Installation</a> ·
+  <a href="#-dataset">Dataset</a> ·
+  <a href="#-feature-map">Feature Map</a> ·
+  <a href="#-license">License</a>
 </p>
 
 </div>
@@ -15,9 +26,9 @@ This repository provides the official open-source implementation of **CDP**, a c
 
 | Focus | Description |
 | --- | --- |
-| **Core idea** | Introduce contour-detail priors to guide robust underwater feature representation. |
-| **Training protocol** | COCO AP aligned training/evaluation for fair checkpoint selection. |
-| **Paper status** | The paper is currently under peer review; the full framework figure and technical details will be released after acceptance. |
+| 🧩 **Core idea** | Introduce contour-detail priors to guide robust underwater feature representation. |
+| 📏 **Training protocol** | COCO AP aligned training/evaluation for fair checkpoint selection. |
+| 📝 **Paper status** | The paper is currently under peer review; the full framework figure and technical details will be released after acceptance. |
 
 ## 🎯 COCO-Aligned Evaluation Protocol
 
