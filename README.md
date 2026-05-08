@@ -163,6 +163,14 @@ This avoids AP mismatch when filenames are not numeric COCO IDs.
 | CDP-style fair comparison | Paper experiments and ablation studies. | `save_json=True`, `use_coco_fitness=True`, `coco_eval_interval=5`, `coco_only_best=True` |
 | Fast pipeline check | Debug whether training runs. | `save_json=False`, `use_coco_fitness=False` |
 
+## 📈 AP Alignment Curves
+
+COCO-aligned checkpoint selection gives a more stable view of validation progress.
+
+<p align="center">
+  <img src="docs/assets/ap_align_metric_curves_en.png" alt="AP alignment metric curves" width="92%">
+</p>
+
 ## 🖼️ Qualitative Preview
 
 The released visualization script supports qualitative inspection of detection outputs.
